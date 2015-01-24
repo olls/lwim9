@@ -34,7 +34,7 @@
         player = this.add.sprite(t, t, 'player');
         
         var g = new SquareGrid(w, h);
-        g.map = extract_map(map);
+        g.walls = extract_map(map);
         
         var start = map.objects['Object Layer 1'].filter(function(o){return o.name == 'start'})[0]
         start  = to_grid([start.x, start.y]);
