@@ -1,0 +1,94 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>hello phaser!</title>
+    <script src="phaser.min.js"></script>
+    <script src="path.js"></script>
+  </head>
+  <body>
+  
+  <script type="text/javascript">
+  
+  var map, layer, path, player;
+  var t = 32;
+  var w = 16,
+      h = 16;
+  
+  window.onload = function() {
+  
+    var game = new Phaser.Game(t*w, t*h, Phaser.AUTO, '', {
+      preload: function () {
+        this.stage.backgroundColor = '#c1bfec';
+        
+        this.load.image('player', 'sprite.png');
+        this.load.image('tile', 'tile.png');
+        this.load.tilemap('map', 'map.json', null, Phaser.Tilemap.TILED_JSON);
+      },
+      create: function () {
+        map = this.add.tilemap('map');
+        map.addTilesetImage('tile');
+        layer = map.createLayer('Tile Layer 1');
+        layer.resizeWorld();
+        map.setCollisionBetween(0, 100);
+        player = this.add.sprite(t, t, 'player');
+        
+        var g = new SquareGrid(w, h);
+        g.map = extract_map(map);
+        
+        var start = map.objects['Object Layer 1'].filter(function(o){return o.name == 'start'})[0]
+        start  = to_grid([start.x, start.y]);
+        
+        var goal = map.objects['Object Layer 1'].filter(function(o){return o.name == 'end'})[0]
+        goal  = to_grid([goal.x, goal.y]);
+        
+        var parents = breadth_first_search(g, start);
+        path = find_path(parents, start, goal);
+        
+        player.pos = 0;
+        
+        this.time.events.loop(Phaser.Timer.SECOND, move_player, this);
+      },
+      update: function () {
+        
+      }
+    });
+  };
+  
+  function move_player () {
+    var next = player.pos + 1;
+    if (next == path.length) {
+      // Delete player
+      return;
+    }
+    console.log(player.pos)
+    player.pos = next;
+    player.x = path[next][0]*t;
+    player.y = path[next][1]*t;
+  }
+  
+  function to_grid (p) {
+    return p.map(function (v) {return Math.floor(v/t)});
+  }
+  
+  function extract_map (map) {
+    // Flatten map
+    var tiles = [].concat.apply([], map.layer.data);
+    
+    // Just get walls
+    tiles = tiles.filter(function(t) {
+      return t.index !== -1;
+    });
+    
+    // Get positions
+    tiles = tiles.map(function (t) {
+      return [t.x, t.y];
+    });
+    
+    return tiles;
+  }
+  
+  </script>
+  
+  </body>
+</html>
