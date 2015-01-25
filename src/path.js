@@ -1,14 +1,3 @@
-function filter (func, arr) {
-  var res = [];
-  for (var i = 0; i < arr.length; i++) {
-    if (func(arr[i])) {
-      res.push(arr[i]);
-    }
-  }
-  return res;
-}
-
-
 Array.prototype.contains = function (needle) {
   needle = needle.toString();
   for (var i in this) {
@@ -64,17 +53,17 @@ var SquareGrid = (function () {
       results.reverse(); // aesthetics
     }
   
-    results = filter((function (self) {
+    results = results.filter((function (self) {
       return function (e) {
         return self.in_bounds(e);
       };
-    })(this), results);
+    })(this));
       
-    results = filter((function (self) {
+    results = results.filter((function (self) {
       return function (e) {
         return self.passable(e);
       };
-    })(this), results);
+    })(this));
     
     return results;
   };
