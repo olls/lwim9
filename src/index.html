@@ -14,7 +14,7 @@
   var t = 32;
   var w = 16,
       h = 16;
-  var p_s = 8; // Player size
+  var a_s = 8; // Alien size
   var d_move = Phaser.Timer.SECOND*.25;
   
   window.onload = function() {
@@ -74,8 +74,8 @@
   
   function path_pos (path, index) {
     return {
-      x: path[index][0]*t + (Math.random() * (t-p_s)),
-      y: path[index][1]*t+ (Math.random() * (t-p_s))
+      x: path[index][0]*t + (Math.random() * (t-a_s)),
+      y: path[index][1]*t+ (Math.random() * (t-a_s))
     };
   }
   
