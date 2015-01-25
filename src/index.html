@@ -10,14 +10,16 @@
   
   <script type="text/javascript">
   
-  var map, layer, path, player;
+  var map, layer, game;
   var t = 32;
   var w = 16,
       h = 16;
+  var p_s = 8; // Player size
+  var d_move = Phaser.Timer.SECOND*.25;
   
   window.onload = function() {
   
-    var game = new Phaser.Game(t*w, t*h, Phaser.AUTO, '', {
+    game = new Phaser.Game(t*w, t*h, Phaser.AUTO, '', {
       preload: function () {
         this.stage.backgroundColor = '#c1bfec';
         
@@ -31,7 +33,9 @@
         layer = map.createLayer('Tile Layer 1');
         layer.resizeWorld();
         map.setCollisionBetween(0, 100);
-        player = this.add.sprite(t, t, 'player');
+        var player = this.add.sprite(t, t, 'player');
+        
+        window.p1 = player;
         
         var g = new SquareGrid(w, h);
         g.walls = extract_map(map);
@@ -43,11 +47,9 @@
         goal  = to_grid([goal.x, goal.y]);
         
         var parents = breadth_first_search(g, start);
-        path = find_path(parents, start, goal);
+        var path = find_path(parents, start, goal);
         
-        player.pos = 0;
-        
-        this.time.events.loop(Phaser.Timer.SECOND, move_player, this);
+        start_path(path, player);
       },
       update: function () {
         
@@ -55,16 +57,35 @@
     });
   };
   
-  function move_player () {
-    var next = player.pos + 1;
-    if (next == path.length) {
+  function start_path (path, p) {
+    var start = path_pos(path, 0);
+    p.x = start.x;
+    p.y = start.y;
+    
+    p.pos = 0;
+    move_player(path, p);
+    game.time.events.repeat(d_move, path.length-1, function () { move_player(path, p) }, this);
+  }
+  
+  function path_pos(path, index) {
+    return {
+      x: path[index][0]*t + (Math.random() * (t-p_s)),
+      y: path[index][1]*t+ (Math.random() * (t-p_s))
+    };
+  }
+  
+  function move_player (path, p) {
+    var pos = path_pos(path, p.pos);
+    
+    game.add.tween(p).to(pos, d_move, Phaser.Easing.Linear.None, true);
+    
+    var next = p.pos + 1;
+    if (next >= path.length) {
       // Delete player
+      console.log('Done')
       return;
     }
-    console.log(player.pos)
-    player.pos = next;
-    player.x = path[next][0]*t;
-    player.y = path[next][1]*t;
+    p.pos = next;
   }
   
   function to_grid (p) {

@@ -107,7 +107,7 @@ function breadth_first_search (graph, start) {
 
 
 function find_path (parents, start, goal) {
-  var path = [];
+  var path = [goal];
   
   var next = parents[goal];
   while (next != start) {
@@ -119,7 +119,7 @@ function find_path (parents, start, goal) {
   }
   
   path.push(start);
-  path.push(goal);
+  path.reverse();
   
   return path;
 }
