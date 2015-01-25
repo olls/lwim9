@@ -2,7 +2,7 @@
 <html>
   <head>
     <meta charset="UTF-8" />
-    <title>hello phaser!</title>
+    <title>Tower Defence!</title>
     <script src="phaser.min.js"></script>
     <script src="path.js"></script>
   </head>
@@ -87,7 +87,7 @@
       
       var next = alien.pos + 1;
       if (next >= path.length) {
-        // TODO: Delete player
+        // TODO: Delete alien
         return;
       }
       alien.pos = next;
