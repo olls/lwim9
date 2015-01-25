@@ -33,9 +33,6 @@
         layer = map.createLayer('Tile Layer 1');
         layer.resizeWorld();
         map.setCollisionBetween(0, 100);
-        var player = this.add.sprite(t, t, 'player');
-        
-        window.p1 = player;
         
         var g = new SquareGrid(w, h);
         g.walls = extract_map(map);
@@ -49,7 +46,11 @@
         var parents = breadth_first_search(g, start);
         var path = find_path(parents, start, goal);
         
-        start_path(path, player);
+        var aliens = [];
+        for (var i = 0; i < 3; i++) {
+          aliens.push(this.add.sprite(0, 0, 'player'));
+        }
+        start_path(path, aliens);
       },
       update: function () {
         
@@ -57,39 +58,44 @@
     });
   };
   
-  function start_path (path, p) {
-    var start = path_pos(path, 0);
-    p.x = start.x;
-    p.y = start.y;
+  function start_path (path, aliens) {
+    aliens.forEach(function (alien) {
+      var start = path_pos(path, 0);
+      alien.x = start.x;
+      alien.y = start.y;
+      
+      alien.pos = 0;
+    });
     
-    p.pos = 0;
-    move_player(path, p);
-    game.time.events.repeat(d_move, path.length-1, function () { move_player(path, p) }, this);
+    move_aliens(path, aliens);
+    
+    game.time.events.repeat(d_move, path.length-1, function () { move_aliens(path, aliens) }, this);
   }
   
-  function path_pos(path, index) {
+  function path_pos (path, index) {
     return {
       x: path[index][0]*t + (Math.random() * (t-p_s)),
       y: path[index][1]*t+ (Math.random() * (t-p_s))
     };
   }
   
-  function move_player (path, p) {
-    var pos = path_pos(path, p.pos);
+  function move_aliens (path, aliens) {
+    aliens.forEach(function (alien) {
+      var pos = path_pos(path, alien.pos);
     
-    game.add.tween(p).to(pos, d_move, Phaser.Easing.Linear.None, true);
-    
-    var next = p.pos + 1;
-    if (next >= path.length) {
-      // Delete player
-      console.log('Done')
-      return;
-    }
-    p.pos = next;
+      game.add.tween(alien).to(pos, d_move, Phaser.Easing.Linear.None, true);
+      
+      var next = alien.pos + 1;
+      if (next >= path.length) {
+        // TODO: Delete player
+        return;
+      }
+      alien.pos = next;
+    });
   }
   
-  function to_grid (p) {
-    return p.map(function (v) {return Math.floor(v/t)});
+  function to_grid (pt) {
+    return pt.map(function (v) {return Math.floor(v/t)});
   }
   
   function extract_map (map) {
