@@ -37,6 +37,7 @@
         var g = new SquareGrid(w, h);
         g.walls = extract_map(map);
         
+        // Get start and end objects
         var start = map.objects['Object Layer 1'].filter(function(o){return o.name == 'start'})[0]
         start  = to_grid([start.x, start.y]);
         
@@ -75,7 +76,7 @@
   function path_pos (path, index) {
     return {
       x: path[index][0]*t + (Math.random() * (t-a_s)),
-      y: path[index][1]*t+ (Math.random() * (t-a_s))
+      y: path[index][1]*t + (Math.random() * (t-a_s))
     };
   }
   
@@ -108,11 +109,9 @@
     });
     
     // Get positions
-    tiles = tiles.map(function (t) {
+    return tiles.map(function (t) {
       return [t.x, t.y];
     });
-    
-    return tiles;
   }
   
   </script>
